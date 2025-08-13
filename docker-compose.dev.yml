@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Development Next.js Application
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=http://localhost:3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - postgres-dev
+    restart: unless-stopped
+    networks:
+      - tenderintel-dev-network
+
+  # Development PostgreSQL Database
+  postgres-dev:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=tenderintel_dev
+      - POSTGRES_USER=dev_user
+      - POSTGRES_PASSWORD=dev_password
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+    networks:
+      - tenderintel-dev-network
+
+volumes:
+  postgres_dev_data:
+
+networks:
+  tenderintel-dev-network:
+    driver: bridge

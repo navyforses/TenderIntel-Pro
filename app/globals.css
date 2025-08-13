@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Fixed circular reference and properly configured Georgian font */
+  --font-sans: "Noto Sans Georgian", ui-sans-serif, system-ui, sans-serif;
+}
